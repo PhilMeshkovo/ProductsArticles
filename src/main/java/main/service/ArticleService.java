@@ -1,7 +1,6 @@
 package main.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +13,7 @@ import main.model.Product;
 import main.repository.ArticleRepo;
 import main.repository.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +29,21 @@ public class ArticleService {
   @Autowired
   ArticleMapper articleMapper;
 
-  public List<ArticleWithIdDto> getAllArticles() {
-    List<Article> allArticles = articleRepo.findAll();
+  public List<ArticleWithIdDto> getAllArticles(String mode) {
     List<ArticleWithIdDto> articleWithIdDtoList = new ArrayList<>();
-    for (Article article : allArticles) {
-      ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
-      articleWithIdDtoList.add(articleWithIdDto);
+    List<Article> allArticles;
+    if (mode.toUpperCase().equals("TIME")) {
+      allArticles = articleRepo.findAll(Sort.by("time").descending());
+      for (Article article : allArticles) {
+        ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
+        articleWithIdDtoList.add(articleWithIdDto);
+      }
+    } else {
+      allArticles = articleRepo.findAll();
+      for (Article article : allArticles) {
+        ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
+        articleWithIdDtoList.add(articleWithIdDto);
+      }
     }
     return articleWithIdDtoList;
   }

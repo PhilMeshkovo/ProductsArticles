@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class ProductWithIdDto extends ProductDto {
-    private long id;
+
+  private long id;
 }
