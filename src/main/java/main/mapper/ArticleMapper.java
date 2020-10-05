@@ -1,8 +1,9 @@
 package main.mapper;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import main.dto.ArticleDto;
-import main.dto.ArticleWithIdDto;
+import main.dto.ArticleWithIdAndTimeDto;
 import main.model.Article;
 import main.model.Product;
 import main.repository.ProductRepo;
@@ -15,8 +16,8 @@ public class ArticleMapper {
   @Autowired
   ProductRepo productRepo;
 
-  public ArticleWithIdDto articleToArticleWithIdDto(Article article) {
-    ArticleWithIdDto articleWithIdDto = new ArticleWithIdDto();
+  public ArticleWithIdAndTimeDto articleToArticleWithIdDto(Article article) {
+    ArticleWithIdAndTimeDto articleWithIdDto = new ArticleWithIdAndTimeDto();
     articleWithIdDto.setId(article.getId());
     articleWithIdDto.setProductId(article.getProduct().getId());
     articleWithIdDto.setText(article.getText());
@@ -31,10 +32,7 @@ public class ArticleMapper {
     article.setProduct(product);
     article.setText(articleDto.getText());
     article.setTitle(articleDto.getTitle());
-
-    LocalDate localDate = LocalDate.parse(articleDto.getTime());
-
-    article.setTime(localDate);
+    article.setTime(LocalDate.now(ZoneId.of("Europe/Moscow")));
     return article;
   }
 }

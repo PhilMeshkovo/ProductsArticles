@@ -1,12 +1,11 @@
 package main.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javassist.NotFoundException;
 import main.dto.ArticleDto;
-import main.dto.ArticleWithIdDto;
+import main.dto.ArticleWithIdAndTimeDto;
 import main.mapper.ArticleMapper;
 import main.model.Article;
 import main.model.Product;
@@ -29,29 +28,31 @@ public class ArticleService {
   @Autowired
   ArticleMapper articleMapper;
 
-  public List<ArticleWithIdDto> getAllArticles(String mode) {
-    List<ArticleWithIdDto> articleWithIdDtoList = new ArrayList<>();
+  public List<ArticleWithIdAndTimeDto> getAllArticles(String mode) throws Exception {
+    List<ArticleWithIdAndTimeDto> articleWithIdDtoList = new ArrayList<>();
     List<Article> allArticles;
     if (mode.toUpperCase().equals("EARLY")) {
+      allArticles = articleRepo.findAll(Sort.by("time"));
+      for (Article article : allArticles) {
+        ArticleWithIdAndTimeDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
+        articleWithIdDtoList.add(articleWithIdDto);
+      }
+    } else if (mode.toUpperCase().equals("RECENT")) {
       allArticles = articleRepo.findAll(Sort.by("time").descending());
       for (Article article : allArticles) {
-        ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
+        ArticleWithIdAndTimeDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
         articleWithIdDtoList.add(articleWithIdDto);
       }
     } else {
-      allArticles = articleRepo.findAll();
-      for (Article article : allArticles) {
-        ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
-        articleWithIdDtoList.add(articleWithIdDto);
-      }
+      throw new Exception("no such mode");
     }
     return articleWithIdDtoList;
   }
 
-  public ArticleWithIdDto getArticleById(long id) throws NotFoundException {
+  public ArticleWithIdAndTimeDto getArticleById(long id) throws NotFoundException {
     Optional<Article> articleById = articleRepo.findById(id);
     if (articleById.isPresent()) {
-      ArticleWithIdDto articleWithIdDto = articleMapper
+      ArticleWithIdAndTimeDto articleWithIdDto = articleMapper
           .articleToArticleWithIdDto(articleById.get());
       return articleWithIdDto;
     } else {
@@ -63,7 +64,6 @@ public class ArticleService {
     Optional<Product> productById = productRepo.findById(articleDto.getProductId());
     if (productById.isPresent()) {
       Article article = articleMapper.articleDtoToArticle(articleDto);
-      article.setTime(LocalDate.now());
       articleRepo.save(article);
     } else {
       throw new NotFoundException("No such product");
@@ -71,13 +71,14 @@ public class ArticleService {
   }
 
   @Transactional
-  public ArticleWithIdDto updateArticle(long id, ArticleDto articleDto) throws NotFoundException {
+  public ArticleWithIdAndTimeDto updateArticle(long id, ArticleDto articleDto)
+      throws NotFoundException {
     Optional<Article> articleById = articleRepo.findById(id);
     if (articleById.isPresent()) {
       Article article = articleRepo.getOne(id);
       article.setText(articleDto.getText());
       article.setTitle(articleDto.getTitle());
-      ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
+      ArticleWithIdAndTimeDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
       return articleWithIdDto;
     } else {
       throw new NotFoundException("No such article");

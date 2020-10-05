@@ -23,7 +23,7 @@ public class ProductService {
   @Autowired
   ProductMapper productMapper;
 
-  public List<ProductWithIdDto> getAllProducts(String mode) {
+  public List<ProductWithIdDto> getAllProducts(String mode) throws Exception {
     List<ProductWithIdDto> productDtoList = new ArrayList<>();
     List<Product> products;
     if (mode.toUpperCase().equals("CHEAP")) {
@@ -32,27 +32,27 @@ public class ProductService {
         ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
         productDtoList.add(productDto);
       }
-    }
-    else if (mode.toUpperCase().equals("EXPENSIVE")) {
+    } else if (mode.toUpperCase().equals("EXPENSIVE")) {
       products = productRepo.findAll(Sort.by("price").descending());
       for (Product product : products) {
         ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
         productDtoList.add(productDto);
       }
-    }
-    else if (mode.toUpperCase().equals("POPULAR")) {
+    } else if (mode.toUpperCase().equals("POPULAR")) {
       products = productRepo.findAllSortedByArticles();
 
       for (Product product : products) {
         ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
         productDtoList.add(productDto);
       }
-    } else {
+    } else if (mode.toUpperCase().equals("ID")) {
       products = productRepo.findAll();
       for (Product product : products) {
         ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
         productDtoList.add(productDto);
       }
+    } else {
+      throw new Exception("no such mode");
     }
     return productDtoList;
   }

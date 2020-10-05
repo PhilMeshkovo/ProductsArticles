@@ -3,7 +3,7 @@ package main.controller;
 import java.util.List;
 import javassist.NotFoundException;
 import main.dto.ArticleDto;
-import main.dto.ArticleWithIdDto;
+import main.dto.ArticleWithIdAndTimeDto;
 import main.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,17 +27,21 @@ public class ArticleController {
   ArticleService articleService;
 
   @GetMapping
-  public @ResponseBody
-  List<ArticleWithIdDto> getAllArticles(@RequestParam(value = "mode",
-      defaultValue = "", required = false) String mode) {
-    return articleService.getAllArticles(mode);
+  public ResponseEntity<?> getAllArticles(@RequestParam(value = "mode",
+      defaultValue = "RECENT", required = false) String mode) {
+    try {
+      List<ArticleWithIdAndTimeDto> articles = articleService.getAllArticles(mode);
+      return ResponseEntity.ok(articles);
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
   }
 
   @GetMapping("/{id}")
   public @ResponseBody
   ResponseEntity<?> getArticleById(@PathVariable long id) {
     try {
-      ArticleWithIdDto articleWithIdDto = articleService.getArticleById(id);
+      ArticleWithIdAndTimeDto articleWithIdDto = articleService.getArticleById(id);
       return ResponseEntity.ok(articleWithIdDto);
     } catch (NotFoundException e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -54,7 +58,7 @@ public class ArticleController {
   public ResponseEntity<?> updateArticle(@PathVariable long id,
       @RequestBody ArticleDto articleDto) {
     try {
-      ArticleWithIdDto articleWithIdDto = articleService.updateArticle(id, articleDto);
+      ArticleWithIdAndTimeDto articleWithIdDto = articleService.updateArticle(id, articleDto);
       return ResponseEntity.ok(articleWithIdDto);
     } catch (NotFoundException e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

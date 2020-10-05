@@ -27,10 +27,14 @@ public class ProductController {
   ProductService productService;
 
   @GetMapping
-  public @ResponseBody
-  List<ProductWithIdDto> getAllProducts(@RequestParam(value = "mode",
-      defaultValue = "", required = false) String mode) {
-    return productService.getAllProducts(mode);
+  public ResponseEntity<?> getAllProducts(@RequestParam(value = "mode",
+      defaultValue = "ID", required = false) String mode) {
+    try {
+      List<ProductWithIdDto> products = productService.getAllProducts(mode);
+      return ResponseEntity.ok(products);
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
   }
 
   @GetMapping("/{id}")
