@@ -3,6 +3,7 @@ package main.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,7 +36,7 @@ public class Product {
   private double price;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private Set<Article> articles = new HashSet<>();
 
 }

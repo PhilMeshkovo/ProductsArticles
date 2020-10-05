@@ -26,15 +26,21 @@ public class ProductService {
   public List<ProductWithIdDto> getAllProducts(String mode) {
     List<ProductWithIdDto> productDtoList = new ArrayList<>();
     List<Product> products;
-    if (mode.toUpperCase().equals("PRICE")) {
+    if (mode.toUpperCase().equals("CHEAP")) {
+      products = productRepo.findAll(Sort.by("price"));
+      for (Product product : products) {
+        ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
+        productDtoList.add(productDto);
+      }
+    }
+    else if (mode.toUpperCase().equals("EXPENSIVE")) {
       products = productRepo.findAll(Sort.by("price").descending());
       for (Product product : products) {
         ProductWithIdDto productDto = productMapper.productToProductWithIdDto(product);
         productDtoList.add(productDto);
-
       }
     }
-    if (mode.toUpperCase().equals("POPULAR")) {
+    else if (mode.toUpperCase().equals("POPULAR")) {
       products = productRepo.findAllSortedByArticles();
 
       for (Product product : products) {

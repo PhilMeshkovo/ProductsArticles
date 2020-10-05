@@ -32,7 +32,7 @@ public class ArticleService {
   public List<ArticleWithIdDto> getAllArticles(String mode) {
     List<ArticleWithIdDto> articleWithIdDtoList = new ArrayList<>();
     List<Article> allArticles;
-    if (mode.toUpperCase().equals("TIME")) {
+    if (mode.toUpperCase().equals("EARLY")) {
       allArticles = articleRepo.findAll(Sort.by("time").descending());
       for (Article article : allArticles) {
         ArticleWithIdDto articleWithIdDto = articleMapper.articleToArticleWithIdDto(article);
